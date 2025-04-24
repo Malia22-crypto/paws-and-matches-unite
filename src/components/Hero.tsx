@@ -24,13 +24,13 @@ const Hero = () => {
               </Button>
             </Link>
             <Link to="/rehome">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/20 w-full sm:w-auto">
+              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/20 w-full sm:w-auto font-medium">
                 <Home className="mr-2 h-5 w-5" />
                 Rehome a Pet
               </Button>
             </Link>
             <Link to="/lost-found">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/20 w-full sm:w-auto">
+              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/20 w-full sm:w-auto font-medium">
                 <Heart className="mr-2 h-5 w-5" />
                 Lost & Found
               </Button>
