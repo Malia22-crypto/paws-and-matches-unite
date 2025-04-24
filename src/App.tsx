@@ -10,6 +10,8 @@ import PetDetailsPage from "./pages/PetDetailsPage";
 import RehomePage from "./pages/RehomePage";
 import LostFoundPage from "./pages/LostFoundPage";
 import AboutPage from "./pages/AboutPage";
+import SignInPage from "./pages/SignInPage";
+import RegisterPage from "./pages/RegisterPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +29,8 @@ const App = () => (
           <Route path="/rehome" element={<RehomePage />} />
           <Route path="/lost-found" element={<LostFoundPage />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/login" element={<SignInPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
