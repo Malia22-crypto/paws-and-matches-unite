@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import MainLayout from '@/components/Layout/MainLayout';
 import { Button } from '@/components/ui/button';
@@ -29,7 +28,6 @@ const LostFoundPage = () => {
   const [activeTab, setActiveTab] = useState('lost');
   const [searchTerm, setSearchTerm] = useState('');
   
-  // Mock data for lost and found pets
   const petReports: PetReport[] = [
     {
       id: "l1",
@@ -40,7 +38,7 @@ const LostFoundPage = () => {
       gender: 'male',
       date: '2023-04-15',
       location: 'Central Park, New York',
-      description: 'Max went missing during our afternoon walk. He's a small beagle with brown and white fur, wearing a red collar with tags. Very friendly and responds to his name.',
+      description: "Max went missing during our afternoon walk. He's a small beagle with brown and white fur, wearing a red collar with tags. Very friendly and responds to his name.",
       image: 'https://images.unsplash.com/photo-1558788353-f76d92427f16?q=80&w=400&auto=format&fit=crop',
       contactName: 'John Smith',
       contactEmail: 'john.smith@example.com',
@@ -55,7 +53,7 @@ const LostFoundPage = () => {
       gender: 'female',
       date: '2023-04-18',
       location: 'Maple Street, Seattle',
-      description: 'Luna slipped out through an open window. She's a medium-sized calico with distinctive orange, black and white patches. Shy around strangers but may approach if offered treats.',
+      description: "Luna slipped out through an open window. She's a medium-sized calico with distinctive orange, black and white patches. Shy around strangers but may approach if offered treats.",
       image: 'https://images.unsplash.com/photo-1583795128727-6ec3642408f8?q=80&w=400&auto=format&fit=crop',
       contactName: 'Emily Johnson',
       contactEmail: 'emily.j@example.com',
@@ -85,7 +83,7 @@ const LostFoundPage = () => {
       gender: 'male',
       date: '2023-04-17',
       location: 'Oak Street, Portland',
-      description: 'Found this friendly male tabby in my backyard. Has a blue collar but no tags. Very affectionate and appears to be someone's pet. Currently keeping him safe at home.',
+      description: "Found this friendly male tabby in my backyard. Has a blue collar but no tags. Very affectionate and appears to be someone's pet. Currently keeping him safe at home.",
       image: 'https://images.unsplash.com/photo-1478098711619-5ab0b478d6e6?q=80&w=400&auto=format&fit=crop',
       contactName: 'Michael Lee',
       contactEmail: 'michael.lee@example.com',
@@ -205,7 +203,6 @@ const LostFoundPage = () => {
           </div>
         </div>
         
-        {/* Search and Reports */}
         <div className="bg-white rounded-xl shadow p-6 mb-12">
           <h2 className="text-2xl font-bold text-pet-blue-dark mb-6">Recent Lost & Found Reports</h2>
           
@@ -243,7 +240,6 @@ const LostFoundPage = () => {
           </Tabs>
         </div>
         
-        {/* Matching System Info */}
         <div className="bg-pet-cream rounded-xl p-8 shadow mb-12">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-2xl font-bold text-pet-blue-dark mb-4">How Our AI Matching System Works</h2>
