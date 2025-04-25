@@ -1,13 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import MainLayout from '@/components/Layout/MainLayout';
-import PetCard, { Pet } from '@/components/PetCard';
+import { Pet } from '@/components/PetCard';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Search, Filter, FilterX } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import SearchBar from '@/components/adopt/SearchBar';
+import FiltersSection from '@/components/adopt/FiltersSection';
+import PetResults from '@/components/adopt/PetResults';
 
 const AdoptPage = () => {
   const allPets: Pet[] = [
@@ -113,10 +110,6 @@ const AdoptPage = () => {
     setFilteredPets(filtered);
   };
 
-  const handleTypeChange = (value: string) => {
-    setSelectedType(value);
-  };
-
   const handleReset = () => {
     setSearchTerm('');
     setSelectedType('');
@@ -129,7 +122,16 @@ const AdoptPage = () => {
     setFilteredPets(allPets);
   };
 
-  React.useEffect(() => {
+  const hasActiveFilters = searchTerm !== '' || 
+    selectedType !== '' || 
+    selectedBreed !== '' || 
+    selectedGender !== '' || 
+    selectedAge !== '' || 
+    selectedSize !== '' || 
+    isVaccinated !== false || 
+    isSpayed !== false;
+
+  useEffect(() => {
     handleSearch();
   }, [selectedType, selectedBreed, selectedGender, selectedAge, selectedSize, isVaccinated, isSpayed]);
 
@@ -145,181 +147,42 @@ const AdoptPage = () => {
 
         <div className="bg-white rounded-xl shadow-md p-6 mb-8">
           <div className="flex flex-col md:flex-row gap-4 mb-4">
-            <div className="flex-grow">
-              <div className="relative">
-                <Input
-                  type="text"
-                  placeholder="Search by name, breed, location..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-                <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-              </div>
-            </div>
+            <SearchBar 
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              onSearch={handleSearch}
+            />
             
             <div className="flex gap-2">
               <Button onClick={handleSearch} className="bg-pet-blue hover:bg-pet-blue-dark">
                 Search
               </Button>
               
-              <Button 
-                variant="outline" 
-                className="border-pet-blue text-pet-blue"
-                onClick={() => setShowFilters(!showFilters)}
-                aria-expanded={showFilters}
-              >
-                {showFilters ? (
-                  <FilterX className="mr-2 h-4 w-4" />
-                ) : (
-                  <Filter className="mr-2 h-4 w-4" />
-                )}
-                {showFilters ? 'Hide Filters' : 'Filters'}
-              </Button>
-              
-              {(searchTerm !== '' || selectedType !== '' || selectedBreed !== '' || selectedGender !== '' || selectedAge !== '' || selectedSize !== '' || isVaccinated !== false || isSpayed !== false) && (
-                <Button variant="ghost" onClick={handleReset}>
-                  Reset
-                </Button>
-              )}
+              <FiltersSection 
+                showFilters={showFilters}
+                setShowFilters={setShowFilters}
+                selectedType={selectedType}
+                selectedBreed={selectedBreed}
+                selectedGender={selectedGender}
+                selectedAge={selectedAge}
+                selectedSize={selectedSize}
+                isVaccinated={isVaccinated}
+                isSpayed={isSpayed}
+                onTypeChange={setSelectedType}
+                onBreedChange={setSelectedBreed}
+                onGenderChange={setSelectedGender}
+                onAgeChange={setSelectedAge}
+                onSizeChange={setSelectedSize}
+                onVaccinatedChange={setIsVaccinated}
+                onSpayedChange={setIsSpayed}
+                onReset={handleReset}
+                hasActiveFilters={hasActiveFilters}
+              />
             </div>
           </div>
-          
-          <Collapsible open={showFilters} onOpenChange={setShowFilters}>
-            <CollapsibleContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 pt-4 border-t border-gray-200">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Pet Type</label>
-                  <Select value={selectedType} onValueChange={handleTypeChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Any type</SelectItem>
-                      <SelectItem value="dog">Dogs</SelectItem>
-                      <SelectItem value="cat">Cats</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Breed</label>
-                  <Select value={selectedBreed} onValueChange={setSelectedBreed}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select breed" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Any breed</SelectItem>
-                      <SelectItem value="golden-retriever">Golden Retriever</SelectItem>
-                      <SelectItem value="labrador">Labrador</SelectItem>
-                      <SelectItem value="german-shepherd">German Shepherd</SelectItem>
-                      <SelectItem value="siamese">Siamese</SelectItem>
-                      <SelectItem value="maine-coon">Maine Coon</SelectItem>
-                      <SelectItem value="tabby">Tabby</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
-                  <Select value={selectedGender} onValueChange={setSelectedGender}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select gender" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Any gender</SelectItem>
-                      <SelectItem value="male">Male</SelectItem>
-                      <SelectItem value="female">Female</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Age</label>
-                  <Select value={selectedAge} onValueChange={setSelectedAge}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select age" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Any age</SelectItem>
-                      <SelectItem value="baby">Baby (0-1 year)</SelectItem>
-                      <SelectItem value="young">Young (1-3 years)</SelectItem>
-                      <SelectItem value="adult">Adult (3-7 years)</SelectItem>
-                      <SelectItem value="senior">Senior (7+ years)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Size</label>
-                  <Select value={selectedSize} onValueChange={setSelectedSize}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select size" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Any size</SelectItem>
-                      <SelectItem value="small">Small</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="large">Large</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="vaccinated" 
-                      checked={isVaccinated}
-                      onCheckedChange={setIsVaccinated}
-                    />
-                    <label 
-                      htmlFor="vaccinated" 
-                      className="text-sm font-medium text-gray-700"
-                    >
-                      Vaccinated
-                    </label>
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="spayed" 
-                      checked={isSpayed}
-                      onCheckedChange={setIsSpayed}
-                    />
-                    <label 
-                      htmlFor="spayed" 
-                      className="text-sm font-medium text-gray-700"
-                    >
-                      Spayed/Neutered
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
         </div>
         
-        <div className="mb-4">
-          <h2 className="text-xl font-semibold">
-            {filteredPets.length} Pets Available
-          </h2>
-        </div>
-        
-        {filteredPets.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-            {filteredPets.map((pet) => (
-              <PetCard key={pet.id} pet={pet} />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12 bg-white rounded-xl shadow-md">
-            <h3 className="text-xl font-semibold mb-2 text-gray-700">No pets found</h3>
-            <p className="text-gray-500">
-              Try adjusting your search criteria or check back later.
-            </p>
-          </div>
-        )}
+        <PetResults pets={filteredPets} />
       </div>
     </MainLayout>
   );
