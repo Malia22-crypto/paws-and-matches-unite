@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import MainLayout from '@/components/Layout/MainLayout';
 import { Button } from '@/components/ui/button';
@@ -7,6 +8,19 @@ import { Heart, Search, MapPin, Calendar } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
 
 interface PetReport {
   id: string;
@@ -27,6 +41,10 @@ interface PetReport {
 const LostFoundPage = () => {
   const [activeTab, setActiveTab] = useState('lost');
   const [searchTerm, setSearchTerm] = useState('');
+  const { toast } = useToast();
+  
+  const [lostPetDialogOpen, setLostPetDialogOpen] = useState(false);
+  const [foundPetDialogOpen, setFoundPetDialogOpen] = useState(false);
   
   const petReports: PetReport[] = [
     {
@@ -113,6 +131,24 @@ const LostFoundPage = () => {
     return new Date(dateString).toLocaleDateString('en-US', options);
   };
 
+  const handleLostPetSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setLostPetDialogOpen(false);
+    toast({
+      title: "Report Submitted",
+      description: "Your lost pet report has been submitted successfully.",
+    });
+  };
+
+  const handleFoundPetSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setFoundPetDialogOpen(false);
+    toast({
+      title: "Report Submitted",
+      description: "Your found pet report has been submitted successfully.",
+    });
+  };
+
   return (
     <MainLayout>
       <div className="container mx-auto">
@@ -156,9 +192,106 @@ const LostFoundPage = () => {
                 </ul>
               </CardContent>
               <CardFooter>
-                <Button className="w-full bg-white text-pet-blue hover:bg-pet-cream-dark">
-                  Report Lost Pet
-                </Button>
+                <Dialog open={lostPetDialogOpen} onOpenChange={setLostPetDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button className="w-full bg-white text-pet-blue hover:bg-pet-cream-dark">
+                      Report Lost Pet
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Report a Lost Pet</DialogTitle>
+                      <DialogDescription>
+                        Please provide as much information as possible about your lost pet to help us find them.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleLostPetSubmit} className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="petType">Pet Type</Label>
+                          <Select required>
+                            <SelectTrigger id="petType">
+                              <SelectValue placeholder="Select type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="dog">Dog</SelectItem>
+                              <SelectItem value="cat">Cat</SelectItem>
+                              <SelectItem value="other">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="breed">Breed (if known)</Label>
+                          <Input id="breed" />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="color">Color</Label>
+                          <Input id="color" required />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="gender">Gender</Label>
+                          <Select>
+                            <SelectTrigger id="gender">
+                              <SelectValue placeholder="Select gender" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="male">Male</SelectItem>
+                              <SelectItem value="female">Female</SelectItem>
+                              <SelectItem value="unknown">Unknown</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="date">Date Last Seen</Label>
+                        <Input id="date" type="date" required />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="location">Last Seen Location</Label>
+                        <Input id="location" required />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="description">Description</Label>
+                        <Textarea 
+                          id="description" 
+                          placeholder="Describe your pet, any unique features, collar, tags, and circumstances of disappearance"
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="image">Upload Image (optional)</Label>
+                        <Input id="image" type="file" accept="image/*" />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="contactName">Your Name</Label>
+                        <Input id="contactName" required />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="contactEmail">Email</Label>
+                          <Input id="contactEmail" type="email" required />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="contactPhone">Phone (optional)</Label>
+                          <Input id="contactPhone" type="tel" />
+                        </div>
+                      </div>
+
+                      <DialogFooter>
+                        <Button type="submit" className="bg-pet-blue hover:bg-pet-blue-dark">Submit Report</Button>
+                      </DialogFooter>
+                    </form>
+                  </DialogContent>
+                </Dialog>
               </CardFooter>
             </Card>
           </div>
@@ -195,9 +328,106 @@ const LostFoundPage = () => {
                 </ul>
               </CardContent>
               <CardFooter>
-                <Button className="w-full bg-pet-blue hover:bg-pet-blue-dark">
-                  Report Found Pet
-                </Button>
+                <Dialog open={foundPetDialogOpen} onOpenChange={setFoundPetDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button className="w-full bg-pet-blue hover:bg-pet-blue-dark">
+                      Report Found Pet
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Report a Found Pet</DialogTitle>
+                      <DialogDescription>
+                        Please provide details about the pet you've found to help us reunite them with their owner.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleFoundPetSubmit} className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="foundPetType">Pet Type</Label>
+                          <Select required>
+                            <SelectTrigger id="foundPetType">
+                              <SelectValue placeholder="Select type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="dog">Dog</SelectItem>
+                              <SelectItem value="cat">Cat</SelectItem>
+                              <SelectItem value="other">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="foundBreed">Breed (if known)</Label>
+                          <Input id="foundBreed" />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="foundColor">Color</Label>
+                          <Input id="foundColor" required />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="foundGender">Gender</Label>
+                          <Select>
+                            <SelectTrigger id="foundGender">
+                              <SelectValue placeholder="Select gender" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="male">Male</SelectItem>
+                              <SelectItem value="female">Female</SelectItem>
+                              <SelectItem value="unknown">Unknown</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="foundDate">Date Found</Label>
+                        <Input id="foundDate" type="date" required />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="foundLocation">Location Found</Label>
+                        <Input id="foundLocation" required />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="foundDescription">Description</Label>
+                        <Textarea 
+                          id="foundDescription" 
+                          placeholder="Describe the pet, any collar or tags, and where/how they were found"
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="foundImage">Upload Image (optional)</Label>
+                        <Input id="foundImage" type="file" accept="image/*" />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="foundContactName">Your Name</Label>
+                        <Input id="foundContactName" required />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="foundContactEmail">Email</Label>
+                          <Input id="foundContactEmail" type="email" required />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="foundContactPhone">Phone (optional)</Label>
+                          <Input id="foundContactPhone" type="tel" />
+                        </div>
+                      </div>
+
+                      <DialogFooter>
+                        <Button type="submit" className="bg-pet-blue hover:bg-pet-blue-dark">Submit Report</Button>
+                      </DialogFooter>
+                    </form>
+                  </DialogContent>
+                </Dialog>
               </CardFooter>
             </Card>
           </div>
