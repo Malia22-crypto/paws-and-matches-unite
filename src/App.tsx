@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import AdoptPage from "./pages/AdoptPage";
 import PetDetailsPage from "./pages/PetDetailsPage";
 import RehomePage from "./pages/RehomePage";
+import RehomeProcessPage from "./pages/RehomeProcessPage";
 import LostFoundPage from "./pages/LostFoundPage";
 import AboutPage from "./pages/AboutPage";
 import SignInPage from "./pages/SignInPage";
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/adopt" element={<AdoptPage />} />
           <Route path="/pet/:id" element={<PetDetailsPage />} />
           <Route path="/rehome" element={<RehomePage />} />
+          <Route path="/rehome/start" element={<RehomeProcessPage />} />
           <Route path="/lost-found" element={<LostFoundPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/login" element={<SignInPage />} />
