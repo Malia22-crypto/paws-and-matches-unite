@@ -10,7 +10,6 @@ import { Separator } from '@/components/ui/separator';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 const AdoptPage = () => {
-  // Mock data for available pets
   const allPets: Pet[] = [
     {
       id: "1",
@@ -87,11 +86,16 @@ const AdoptPage = () => {
   ];
 
   const [filteredPets, setFilteredPets] = useState<Pet[]>(allPets);
-  const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<string>('');
+  const [selectedBreed, setSelectedBreed] = useState<string>('');
+  const [selectedGender, setSelectedGender] = useState<string>('');
+  const [selectedAge, setSelectedAge] = useState<string>('');
+  const [selectedSize, setSelectedSize] = useState<string>('');
+  const [isVaccinated, setIsVaccinated] = useState<boolean>(false);
+  const [isSpayed, setIsSpayed] = useState<boolean>(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
 
-  // Filter handlers
   const handleSearch = () => {
     const filtered = allPets.filter(pet => {
       const matchesSearch = searchTerm === '' || 
@@ -99,9 +103,11 @@ const AdoptPage = () => {
         pet.breed.toLowerCase().includes(searchTerm.toLowerCase()) ||
         pet.location.toLowerCase().includes(searchTerm.toLowerCase());
         
-      const matchesType = selectedType === '' || pet.type === selectedType;
+      const matchesType = selectedType === '' || selectedType === 'all' || pet.type === selectedType;
+      const matchesBreed = selectedBreed === '' || selectedBreed === 'all' || pet.breed.toLowerCase().includes(selectedBreed.toLowerCase());
+      const matchesGender = selectedGender === '' || selectedGender === 'all' || pet.gender === selectedGender;
       
-      return matchesSearch && matchesType;
+      return matchesSearch && matchesType && matchesBreed && matchesGender;
     });
     
     setFilteredPets(filtered);
@@ -114,13 +120,18 @@ const AdoptPage = () => {
   const handleReset = () => {
     setSearchTerm('');
     setSelectedType('');
+    setSelectedBreed('');
+    setSelectedGender('');
+    setSelectedAge('');
+    setSelectedSize('');
+    setIsVaccinated(false);
+    setIsSpayed(false);
     setFilteredPets(allPets);
   };
 
-  // Filtering on input change
   React.useEffect(() => {
     handleSearch();
-  }, [selectedType]);
+  }, [selectedType, selectedBreed, selectedGender, selectedAge, selectedSize, isVaccinated, isSpayed]);
 
   return (
     <MainLayout>
@@ -132,7 +143,6 @@ const AdoptPage = () => {
           </p>
         </div>
 
-        {/* Search and filters */}
         <div className="bg-white rounded-xl shadow-md p-6 mb-8">
           <div className="flex flex-col md:flex-row gap-4 mb-4">
             <div className="flex-grow">
@@ -167,7 +177,7 @@ const AdoptPage = () => {
                 {showFilters ? 'Hide Filters' : 'Filters'}
               </Button>
               
-              {(searchTerm !== '' || selectedType !== '') && (
+              {(searchTerm !== '' || selectedType !== '' || selectedBreed !== '' || selectedGender !== '' || selectedAge !== '' || selectedSize !== '' || isVaccinated !== false || isSpayed !== false) && (
                 <Button variant="ghost" onClick={handleReset}>
                   Reset
                 </Button>
@@ -192,12 +202,104 @@ const AdoptPage = () => {
                     </SelectContent>
                   </Select>
                 </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Breed</label>
+                  <Select value={selectedBreed} onValueChange={setSelectedBreed}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select breed" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Any breed</SelectItem>
+                      <SelectItem value="golden-retriever">Golden Retriever</SelectItem>
+                      <SelectItem value="labrador">Labrador</SelectItem>
+                      <SelectItem value="german-shepherd">German Shepherd</SelectItem>
+                      <SelectItem value="siamese">Siamese</SelectItem>
+                      <SelectItem value="maine-coon">Maine Coon</SelectItem>
+                      <SelectItem value="tabby">Tabby</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                  <Select value={selectedGender} onValueChange={setSelectedGender}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select gender" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Any gender</SelectItem>
+                      <SelectItem value="male">Male</SelectItem>
+                      <SelectItem value="female">Female</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Age</label>
+                  <Select value={selectedAge} onValueChange={setSelectedAge}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select age" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Any age</SelectItem>
+                      <SelectItem value="baby">Baby (0-1 year)</SelectItem>
+                      <SelectItem value="young">Young (1-3 years)</SelectItem>
+                      <SelectItem value="adult">Adult (3-7 years)</SelectItem>
+                      <SelectItem value="senior">Senior (7+ years)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Size</label>
+                  <Select value={selectedSize} onValueChange={setSelectedSize}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select size" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Any size</SelectItem>
+                      <SelectItem value="small">Small</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="large">Large</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="vaccinated" 
+                      checked={isVaccinated}
+                      onCheckedChange={setIsVaccinated}
+                    />
+                    <label 
+                      htmlFor="vaccinated" 
+                      className="text-sm font-medium text-gray-700"
+                    >
+                      Vaccinated
+                    </label>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="spayed" 
+                      checked={isSpayed}
+                      onCheckedChange={setIsSpayed}
+                    />
+                    <label 
+                      htmlFor="spayed" 
+                      className="text-sm font-medium text-gray-700"
+                    >
+                      Spayed/Neutered
+                    </label>
+                  </div>
+                </div>
               </div>
             </CollapsibleContent>
           </Collapsible>
         </div>
         
-        {/* Results */}
         <div className="mb-4">
           <h2 className="text-xl font-semibold">
             {filteredPets.length} Pets Available
