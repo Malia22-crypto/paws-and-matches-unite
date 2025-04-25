@@ -49,7 +49,7 @@ const Hero = () => {
                 id="pet-type"
                 className="w-full rounded-md border-gray-300 bg-white/80 text-pet-blue-dark px-3 py-2"
               >
-                <option value="">Any type</option>
+                <option value="any">Any type</option>
                 <option value="dog">Dogs</option>
                 <option value="cat">Cats</option>
                 <option value="other">Other Pets</option>

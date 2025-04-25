@@ -179,7 +179,7 @@ const AdoptPage = () => {
                     <SelectValue placeholder="Select type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Any type</SelectItem>
+                    <SelectItem value="all">Any type</SelectItem>
                     <SelectItem value="dog">Dogs</SelectItem>
                     <SelectItem value="cat">Cats</SelectItem>
                     <SelectItem value="other">Other</SelectItem>
