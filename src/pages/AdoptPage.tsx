@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import MainLayout from '@/components/Layout/MainLayout';
 import PetCard, { Pet } from '@/components/PetCard';
@@ -6,8 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Search, Filter } from 'lucide-react';
+import { Search, Filter, FilterX } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 const AdoptPage = () => {
   // Mock data for available pets
@@ -157,9 +157,14 @@ const AdoptPage = () => {
                 variant="outline" 
                 className="border-pet-blue text-pet-blue"
                 onClick={() => setShowFilters(!showFilters)}
+                aria-expanded={showFilters}
               >
-                <Filter className="mr-2 h-4 w-4" />
-                Filters
+                {showFilters ? (
+                  <FilterX className="mr-2 h-4 w-4" />
+                ) : (
+                  <Filter className="mr-2 h-4 w-4" />
+                )}
+                {showFilters ? 'Hide Filters' : 'Filters'}
               </Button>
               
               {(searchTerm !== '' || selectedType !== '') && (
@@ -170,26 +175,26 @@ const AdoptPage = () => {
             </div>
           </div>
           
-          {showFilters && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 pt-4 border-t border-gray-200">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Pet Type</label>
-                <Select value={selectedType} onValueChange={handleTypeChange}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Any type</SelectItem>
-                    <SelectItem value="dog">Dogs</SelectItem>
-                    <SelectItem value="cat">Cats</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
+          <Collapsible open={showFilters} onOpenChange={setShowFilters}>
+            <CollapsibleContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 pt-4 border-t border-gray-200">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Pet Type</label>
+                  <Select value={selectedType} onValueChange={handleTypeChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Any type</SelectItem>
+                      <SelectItem value="dog">Dogs</SelectItem>
+                      <SelectItem value="cat">Cats</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-              
-              {/* Additional filters can be added here */}
-            </div>
-          )}
+            </CollapsibleContent>
+          </Collapsible>
         </div>
         
         {/* Results */}
