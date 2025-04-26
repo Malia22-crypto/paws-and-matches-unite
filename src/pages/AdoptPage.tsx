@@ -1,12 +1,19 @@
+
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import MainLayout from '@/components/Layout/MainLayout';
 import { Pet } from '@/components/PetCard';
 import { Button } from '@/components/ui/button';
 import SearchBar from '@/components/adopt/SearchBar';
 import FiltersSection from '@/components/adopt/FiltersSection';
 import PetResults from '@/components/adopt/PetResults';
+import { toast } from '@/components/ui/use-toast';
 
 const AdoptPage = () => {
+  const location = useLocation();
+  const adoptionSubmitted = location.state?.adoptionSubmitted;
+  const petName = location.state?.petName;
+
   const allPets: Pet[] = [
     {
       id: "1",
@@ -92,6 +99,19 @@ const AdoptPage = () => {
   const [isSpayed, setIsSpayed] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+
+  // Show adoption submission toast if redirected from PetDetailsPage
+  useEffect(() => {
+    if (adoptionSubmitted && petName) {
+      toast({
+        title: "Application Received",
+        description: `Your application to adopt ${petName} has been received. Our team will contact you soon!`,
+      });
+      
+      // Clear location state
+      window.history.replaceState({}, document.title);
+    }
+  }, [adoptionSubmitted, petName]);
 
   const handleSearch = () => {
     const filtered = allPets.filter(pet => {

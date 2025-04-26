@@ -1,6 +1,5 @@
-
-import React from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/Layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,15 +8,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Heart, Calendar, MapPin } from 'lucide-react';
 import { Pet } from '@/components/PetCard';
+import { toast } from '@/components/ui/use-toast';
 
 const PetDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
-  const [pet, setPet] = React.useState<Pet | null>(null);
-  const [isFavorite, setIsFavorite] = React.useState(false);
+  const [pet, setPet] = useState<Pet | null>(null);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const navigate = useNavigate();
   
   React.useEffect(() => {
-    // In a real application, you would fetch the pet details from an API
-    // For now, we'll simulate it with mock data
     const mockPets: Pet[] = [
       {
         id: "1",
@@ -67,6 +66,22 @@ const PetDetailsPage = () => {
     setIsFavorite(!isFavorite);
   };
 
+  const handleApplyToAdopt = () => {
+    toast({
+      title: "Application Submitted",
+      description: `Thank you for your interest in adopting ${pet?.name}! We'll contact you soon.`,
+    });
+    
+    setTimeout(() => {
+      navigate('/adopt', { 
+        state: { 
+          adoptionSubmitted: true,
+          petName: pet?.name
+        }
+      });
+    }, 2000);
+  };
+
   const statusColors = {
     available: "bg-green-100 text-green-800 hover:bg-green-200",
     adopted: "bg-gray-100 text-gray-800 hover:bg-gray-200",
@@ -83,7 +98,6 @@ const PetDetailsPage = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left column - Images */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl overflow-hidden shadow-md">
               <img
@@ -195,7 +209,6 @@ const PetDetailsPage = () => {
             </div>
           </div>
           
-          {/* Right column - Action card */}
           <div>
             <Card>
               <CardHeader>
@@ -206,7 +219,10 @@ const PetDetailsPage = () => {
               <CardContent className="space-y-4">
                 {pet.status === 'available' ? (
                   <>
-                    <Button className="w-full bg-pet-blue hover:bg-pet-blue-dark">
+                    <Button 
+                      className="w-full bg-pet-blue hover:bg-pet-blue-dark"
+                      onClick={handleApplyToAdopt}
+                    >
                       Apply to Adopt {pet.name}
                     </Button>
                   
