@@ -1,0 +1,123 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  adoptionRequests    AdoptionRequest?    @relation(fields: [adoptionRequestsId], references: [id])
+  adoptionRequestsId  String?
+  createdAt           DateTime            @default(now())
+  email               String?             @unique
+  firstName           String?
+  id                  String              @id @default(cuid())
+  lostAndFoundReports LostAndFoundReport?
+  password            String
+  pets                Pet?
+  phonenumber         String?
+  profilePicture      Json?
+  roles               EnumUserRoles
+  updatedAt           DateTime            @updatedAt
+  username            String              @unique
+}
+
+model Pet {
+  adoptionRequests AdoptionRequest[]
+  age              Int?
+  aiMatches        AiMatch?          @relation(fields: [aiMatchesId], references: [id])
+  aiMatchesId      String?           @unique
+  breed            String?
+  createdAt        DateTime          @default(now())
+  description      String?
+  gender           EnumPetGender?
+  id               String            @id @default(cuid())
+  imageUrl         Json?
+  location         String?
+  name             String?
+  owner            User?             @relation(fields: [ownerId], references: [id])
+  ownerId          String?           @unique
+  status           EnumPetStatus?
+  typeField        EnumPetTypeField?
+  updatedAt        DateTime          @updatedAt
+}
+
+model LostAndFoundReport {
+  aiMatches    AiMatch?
+  contactInfo  String?
+  createdAt    DateTime                          @default(now())
+  description  String?
+  id           String                            @id @default(cuid())
+  imageUrl     Json?
+  location     String?
+  petName      String?
+  petType      EnumLostAndFoundReportPetType?
+  reportType   EnumLostAndFoundReportReportType?
+  reportedBy   User?                             @relation(fields: [reportedById], references: [id])
+  reportedById String?                           @unique
+  updatedAt    DateTime                          @updatedAt
+}
+
+model AiMatch {
+  confidenceScore Decimal
+  createdAt       DateTime           @default(now())
+  id              String             @id @default(cuid())
+  lostReport      LostAndFoundReport @relation(fields: [lostReportId], references: [id])
+  lostReportId    String             @unique
+  matchedOn       DateTime
+  matchedPet      Pet?
+  updatedAt       DateTime           @updatedAt
+}
+
+model AdoptionRequest {
+  adopter     User[]
+  createdAt   DateTime                   @default(now())
+  id          String                     @id @default(cuid())
+  message     String?
+  pet         Pet                        @relation(fields: [petId], references: [id])
+  petId       String
+  requestedOn DateTime?
+  status      EnumAdoptionRequestStatus?
+  updatedAt   DateTime                   @updatedAt
+}
+
+enum EnumUserRoles {
+  User
+  Admin
+}
+
+enum EnumPetGender {
+  Male
+  Female
+  Unknown
+}
+
+enum EnumPetStatus {
+  Available
+  Adopted
+  Lost
+  Found
+}
+
+enum EnumPetTypeField {
+  Cat
+  Dog
+}
+
+enum EnumLostAndFoundReportPetType {
+  Dog
+  Cat
+}
+
+enum EnumLostAndFoundReportReportType {
+  Lost
+  Found
+}
+
+enum EnumAdoptionRequestStatus {
+  Pending
+  Approved
+  Rejected
+}
