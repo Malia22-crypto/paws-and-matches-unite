@@ -1,10 +1,25 @@
 
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Search, Heart, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const Hero = () => {
+  const navigate = useNavigate();
+  const [petType, setPetType] = useState('any');
+  const [location, setLocation] = useState('');
+
+  const handleQuickSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    navigate('/adopt', { 
+      state: { 
+        quickSearch: true,
+        petType,
+        location
+      } 
+    });
+  };
+
   return (
     <div className="relative overflow-hidden bg-gradient-to-b from-pet-blue to-pet-blue-dark text-white py-16 md:py-24 px-4 rounded-3xl shadow-xl">
       <div className="container mx-auto relative z-10">
@@ -38,7 +53,7 @@ const Hero = () => {
           </div>
         </div>
 
-        <div className="mt-8 bg-white/10 backdrop-blur-sm rounded-xl p-6 max-w-2xl mx-auto">
+        <form onSubmit={handleQuickSearch} className="mt-8 bg-white/10 backdrop-blur-sm rounded-xl p-6 max-w-2xl mx-auto">
           <h2 className="text-xl font-semibold mb-4 text-center">Quick Search</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -48,6 +63,8 @@ const Hero = () => {
               <select 
                 id="pet-type"
                 className="w-full rounded-md border-gray-300 bg-white/80 text-pet-blue-dark px-3 py-2"
+                value={petType}
+                onChange={(e) => setPetType(e.target.value)}
               >
                 <option value="any">Any type</option>
                 <option value="dog">Dogs</option>
@@ -65,17 +82,19 @@ const Hero = () => {
                 id="location"
                 placeholder="City or ZIP code"
                 className="w-full rounded-md border-gray-300 bg-white/80 text-pet-blue-dark px-3 py-2"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
               />
             </div>
           </div>
           
           <div className="mt-4 text-center">
-            <Button className="bg-pet-blue-dark hover:bg-pet-blue border-white border">
+            <Button type="submit" className="bg-pet-blue-dark hover:bg-pet-blue border-white border">
               <Search className="mr-2 h-4 w-4" />
               Search
             </Button>
           </div>
-        </div>
+        </form>
       </div>
       
       {/* Decorative elements */}

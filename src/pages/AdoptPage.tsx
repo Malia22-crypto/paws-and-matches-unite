@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import MainLayout from '@/components/Layout/MainLayout';
@@ -13,6 +12,10 @@ const AdoptPage = () => {
   const location = useLocation();
   const adoptionSubmitted = location.state?.adoptionSubmitted;
   const petName = location.state?.petName;
+  
+  const quickSearch = location.state?.quickSearch;
+  const quickSearchPetType = location.state?.petType;
+  const quickSearchLocation = location.state?.location;
 
   const allPets: Pet[] = [
     {
@@ -90,17 +93,16 @@ const AdoptPage = () => {
   ];
 
   const [filteredPets, setFilteredPets] = useState<Pet[]>(allPets);
-  const [selectedType, setSelectedType] = useState<string>('');
+  const [selectedType, setSelectedType] = useState<string>(quickSearchPetType || '');
   const [selectedBreed, setSelectedBreed] = useState<string>('');
   const [selectedGender, setSelectedGender] = useState<string>('');
   const [selectedAge, setSelectedAge] = useState<string>('');
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [isVaccinated, setIsVaccinated] = useState<boolean>(false);
   const [isSpayed, setIsSpayed] = useState<boolean>(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(quickSearchLocation || '');
   const [showFilters, setShowFilters] = useState(false);
 
-  // Show adoption submission toast if redirected from PetDetailsPage
   useEffect(() => {
     if (adoptionSubmitted && petName) {
       toast({
@@ -108,10 +110,17 @@ const AdoptPage = () => {
         description: `Your application to adopt ${petName} has been received. Our team will contact you soon!`,
       });
       
-      // Clear location state
       window.history.replaceState({}, document.title);
     }
-  }, [adoptionSubmitted, petName]);
+    
+    if (quickSearch) {
+      handleSearch();
+      
+      const newState = {...location.state};
+      delete newState.quickSearch;
+      window.history.replaceState(newState, document.title);
+    }
+  }, [adoptionSubmitted, petName, quickSearch]);
 
   const handleSearch = () => {
     const filtered = allPets.filter(pet => {
@@ -120,7 +129,7 @@ const AdoptPage = () => {
         pet.breed.toLowerCase().includes(searchTerm.toLowerCase()) ||
         pet.location.toLowerCase().includes(searchTerm.toLowerCase());
         
-      const matchesType = selectedType === '' || selectedType === 'all' || pet.type === selectedType;
+      const matchesType = selectedType === '' || selectedType === 'all' || selectedType === 'any' || pet.type === selectedType;
       const matchesBreed = selectedBreed === '' || selectedBreed === 'all' || pet.breed.toLowerCase().includes(selectedBreed.toLowerCase());
       const matchesGender = selectedGender === '' || selectedGender === 'all' || pet.gender === selectedGender;
       
