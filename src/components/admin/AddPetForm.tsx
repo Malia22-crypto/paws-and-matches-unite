@@ -11,8 +11,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card, CardContent } from '@/components/ui/card';
 import { toast } from '@/components/ui/use-toast';
+import { addPet } from '@/services/petService';
+import { Pet } from '@/components/PetCard';
 
 interface PetFormData {
   name: string;
@@ -92,8 +93,26 @@ const AddPetForm = () => {
       return;
     }
     
-    // Here you would typically submit the form data to your backend API
-    // For demo purposes, we'll just show a success toast
+    // Use the first image URL for simplicity
+    // In a real app, you would upload these images to a storage service
+    const imageUrl = previewUrls[0];
+    
+    // Create new pet object
+    const newPet: Omit<Pet, 'id'> = {
+      name: formData.name,
+      type: formData.type,
+      breed: formData.breed,
+      age: formData.age,
+      gender: formData.gender,
+      location: formData.location,
+      description: formData.description,
+      image: imageUrl,
+      status: "available"
+    };
+    
+    // Add pet using our service
+    addPet(newPet);
+    
     toast({
       title: "Pet Added Successfully",
       description: `${formData.name} has been added to available pets.`,

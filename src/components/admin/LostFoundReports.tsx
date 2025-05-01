@@ -1,10 +1,15 @@
 
 import React, { useState } from 'react';
-import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { FileText, Search } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { 
   Select,
   SelectContent,
@@ -12,294 +17,247 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from '@/components/ui/use-toast';
-
-// Mock data for lost and found reports
-const mockReports = [
-  {
-    id: '1',
-    reportType: 'lost',
-    petName: 'Buddy',
-    petType: 'Dog',
-    breed: 'Labrador',
-    location: 'Central Park, New York',
-    reporterName: 'Robert Anderson',
-    contactInfo: 'robert@example.com, (555) 123-4567',
-    reportedDate: '2025-04-15',
-    description: 'Golden brown male Labrador, wearing a blue collar with ID tag.',
-    status: 'open'
-  },
-  {
-    id: '2',
-    reportType: 'found',
-    petName: 'Unknown',
-    petType: 'Cat',
-    breed: 'Tabby',
-    location: 'Downtown, Boston',
-    reporterName: 'Melissa Brown',
-    contactInfo: 'melissa@example.com, (555) 234-5678',
-    reportedDate: '2025-04-16',
-    description: 'Gray tabby cat with white paws, no collar, seems friendly and well-fed.',
-    status: 'open'
-  },
-  {
-    id: '3',
-    reportType: 'lost',
-    petName: 'Coco',
-    petType: 'Cat',
-    breed: 'Siamese',
-    location: 'West End, Chicago',
-    reporterName: 'Daniel White',
-    contactInfo: 'daniel@example.com, (555) 345-6789',
-    reportedDate: '2025-04-17',
-    description: 'Cream colored Siamese cat with blue eyes, wearing a red collar with bell.',
-    status: 'matched'
-  },
-  {
-    id: '4',
-    reportType: 'found',
-    petName: 'Unknown',
-    petType: 'Dog',
-    breed: 'Beagle',
-    location: 'Riverside Park, Miami',
-    reporterName: 'Jennifer Garcia',
-    contactInfo: 'jennifer@example.com, (555) 456-7890',
-    reportedDate: '2025-04-18',
-    description: 'Small beagle, brown and white, wearing a torn green collar, no tags.',
-    status: 'closed'
-  }
-];
-
-interface LostFoundReport {
-  id: string;
-  reportType: 'lost' | 'found';
-  petName: string;
-  petType: string;
-  breed: string;
-  location: string;
-  reporterName: string;
-  contactInfo: string;
-  reportedDate: string;
-  description: string;
-  status: 'open' | 'matched' | 'closed';
-}
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { LostFoundReport } from '@/types/admin';
 
 const LostFoundReports = () => {
-  const [reports, setReports] = useState<LostFoundReport[]>(mockReports);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedReport, setSelectedReport] = useState<LostFoundReport | null>(null);
-  const [reportTypeFilter, setReportTypeFilter] = useState<string>('all');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [typeFilter, setTypeFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [viewReport, setViewReport] = useState<LostFoundReport | null>(null);
   
-  // Filter reports based on search term, report type, and status
-  const filteredReports = reports.filter(report => {
+  // Mock lost & found reports data
+  const lostFoundReports: LostFoundReport[] = [
+    {
+      id: "1",
+      reportType: "lost",
+      petName: "Charlie",
+      petType: "Dog",
+      breed: "Poodle",
+      location: "Central Park, New York",
+      reporterName: "Jennifer Adams",
+      contactInfo: "jennifer@example.com, 555-111-2222",
+      reportedDate: "2023-04-16",
+      description: "Small white poodle with blue collar, responds to Charlie. Last seen near the lake.",
+      status: "pending"
+    },
+    {
+      id: "2",
+      reportType: "found",
+      petName: "Unknown",
+      petType: "Cat",
+      breed: "Calico",
+      location: "Main St & 5th Ave, Seattle",
+      reporterName: "Robert Jackson",
+      contactInfo: "robert@example.com, 555-333-4444",
+      reportedDate: "2023-04-15",
+      description: "Female calico cat, very friendly. No collar, but appears well-cared for.",
+      status: "resolved"
+    },
+    {
+      id: "3",
+      reportType: "lost",
+      petName: "Buddy",
+      petType: "Dog",
+      breed: "Golden Retriever",
+      location: "Lincoln Park, Chicago",
+      reporterName: "Patricia Miller",
+      contactInfo: "patricia@example.com, 555-555-6666",
+      reportedDate: "2023-04-14",
+      description: "Golden retriever with red collar and ID tag. Very friendly and responds to Buddy.",
+      status: "closed"
+    }
+  ];
+  
+  const filteredReports = lostFoundReports.filter(report => {
     const matchesSearch = 
       report.petName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      report.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      report.description.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesReportType = reportTypeFilter === 'all' || report.reportType === reportTypeFilter;
+      report.breed.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      report.location.toLowerCase().includes(searchTerm.toLowerCase());
+      
+    const matchesType = typeFilter === 'all' || report.reportType === typeFilter;
     const matchesStatus = statusFilter === 'all' || report.status === statusFilter;
     
-    return matchesSearch && matchesReportType && matchesStatus;
+    return matchesSearch && matchesType && matchesStatus;
   });
   
-  const handleMarkAsMatched = (id: string) => {
-    setReports(reports.map(report => 
-      report.id === id ? { ...report, status: 'matched' } : report
-    ));
-    
-    toast({
-      title: "Report Marked as Matched",
-      description: "The lost and found report has been marked as matched."
-    });
+  const handleViewReport = (report: LostFoundReport) => {
+    setViewReport(report);
   };
   
-  const handleMarkAsClosed = (id: string) => {
-    setReports(reports.map(report => 
-      report.id === id ? { ...report, status: 'closed' } : report
-    ));
+  const handleUpdateStatus = (id: string, newStatus: "pending" | "resolved" | "closed") => {
+    // Here you would update the status in your backend
+    console.log(`Updating report ${id} status to ${newStatus}`);
     
-    toast({
-      title: "Report Marked as Closed",
-      description: "The lost and found report has been closed."
-    });
-  };
-  
-  const handleView = (report: LostFoundReport) => {
-    setSelectedReport(report);
+    // Close dialog if it's open for this report
+    if (viewReport?.id === id) {
+      setViewReport(null);
+    }
   };
   
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row gap-4 justify-between">
-        <div className="flex flex-wrap gap-2">
-          <Select
-            value={reportTypeFilter}
-            onValueChange={setReportTypeFilter}
-          >
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Report Type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="lost">Lost</SelectItem>
-              <SelectItem value="found">Found</SelectItem>
-            </SelectContent>
-          </Select>
-          
-          <Select
-            value={statusFilter}
-            onValueChange={setStatusFilter}
-          >
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="open">Open</SelectItem>
-              <SelectItem value="matched">Matched</SelectItem>
-              <SelectItem value="closed">Closed</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="relative">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input 
-            placeholder="Search reports..." 
-            className="pl-8 w-full sm:w-[250px]" 
+      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+        <div className="flex-1">
+          <Input
+            placeholder="Search by pet, breed, or location"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full"
           />
         </div>
+        <Select value={typeFilter} onValueChange={setTypeFilter}>
+          <SelectTrigger className="w-[150px]">
+            <SelectValue placeholder="Report Type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Types</SelectItem>
+            <SelectItem value="lost">Lost</SelectItem>
+            <SelectItem value="found">Found</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-[150px]">
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Statuses</SelectItem>
+            <SelectItem value="pending">Pending</SelectItem>
+            <SelectItem value="resolved">Resolved</SelectItem>
+            <SelectItem value="closed">Closed</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
       
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Pet</TableHead>
-              <TableHead>Location</TableHead>
-              <TableHead>Reporter</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredReports.length > 0 ? (
-              filteredReports.map(report => (
-                <TableRow key={report.id}>
-                  <TableCell>{report.reportedDate}</TableCell>
-                  <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      report.reportType === 'lost' ? 'bg-orange-100 text-orange-800' :
-                      'bg-blue-100 text-blue-800'
-                    }`}>
-                      {report.reportType.charAt(0).toUpperCase() + report.reportType.slice(1)}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    {report.petName !== 'Unknown' ? report.petName : 'Unnamed'} 
-                    <span className="text-gray-500 text-xs block">
-                      {report.petType}, {report.breed}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-xs">{report.location}</span>
-                  </TableCell>
-                  <TableCell>{report.reporterName}</TableCell>
-                  <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      report.status === 'open' ? 'bg-yellow-100 text-yellow-800' :
-                      report.status === 'matched' ? 'bg-green-100 text-green-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {report.status.charAt(0).toUpperCase() + report.status.slice(1)}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-1">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => handleView(report)}
-                      >
-                        <FileText className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={7} className="text-center py-6 text-gray-500">
-                  No lost and found reports found.
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Type</TableHead>
+            <TableHead>Pet</TableHead>
+            <TableHead>Location</TableHead>
+            <TableHead>Reported Date</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {filteredReports.length > 0 ? (
+            filteredReports.map((report) => (
+              <TableRow key={report.id}>
+                <TableCell>
+                  <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                    report.reportType === 'lost' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+                  }`}>
+                    {report.reportType === 'lost' ? 'Lost' : 'Found'}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  {report.petName !== 'Unknown' ? report.petName : ''} 
+                  ({report.petType}, {report.breed})
+                </TableCell>
+                <TableCell>{report.location}</TableCell>
+                <TableCell>{report.reportedDate}</TableCell>
+                <TableCell>
+                  <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                    report.status === 'resolved' ? 'bg-blue-100 text-blue-800' :
+                    report.status === 'closed' ? 'bg-gray-100 text-gray-800' :
+                    'bg-yellow-100 text-yellow-800'
+                  }`}>
+                    {report.status.charAt(0).toUpperCase() + report.status.slice(1)}
+                  </span>
+                </TableCell>
+                <TableCell className="text-right">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleViewReport(report)}
+                  >
+                    View
+                  </Button>
                 </TableCell>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={6} className="text-center py-6 text-gray-500">
+                No reports found matching your filters.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
       
-      {/* Detail View */}
-      {selectedReport && (
-        <Card className="mt-6">
-          <CardContent className="pt-6">
-            <div className="flex justify-between items-start mb-4">
-              <h3 className="text-lg font-semibold">
-                {selectedReport.reportType === 'lost' ? 'Lost' : 'Found'} Pet Report Details
-              </h3>
-              <Button variant="outline" size="sm" onClick={() => setSelectedReport(null)}>
-                Close
-              </Button>
+      {/* Report details dialog */}
+      {viewReport && (
+        <Dialog open={!!viewReport} onOpenChange={() => setViewReport(null)}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>
+                {viewReport.reportType === 'lost' ? 'Lost Pet Report' : 'Found Pet Report'}
+              </DialogTitle>
+              <DialogDescription>
+                Reported on {viewReport.reportedDate}
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
+              <div>
+                <h4 className="font-semibold mb-2">Pet Information</h4>
+                {viewReport.petName !== 'Unknown' && (
+                  <p><span className="font-medium">Name:</span> {viewReport.petName}</p>
+                )}
+                <p><span className="font-medium">Type:</span> {viewReport.petType}</p>
+                <p><span className="font-medium">Breed:</span> {viewReport.breed}</p>
+                <p><span className="font-medium">Location:</span> {viewReport.location}</p>
+              </div>
+              
+              <div>
+                <h4 className="font-semibold mb-2">Reporter Information</h4>
+                <p><span className="font-medium">Name:</span> {viewReport.reporterName}</p>
+                <p><span className="font-medium">Contact:</span> {viewReport.contactInfo}</p>
+              </div>
+              
+              <div className="md:col-span-2">
+                <h4 className="font-semibold mb-2">Description</h4>
+                <p className="bg-gray-50 p-3 rounded">{viewReport.description}</p>
+              </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-medium text-gray-500 mb-2">Pet Information</h4>
-                <p><strong>Name:</strong> {selectedReport.petName !== 'Unknown' ? selectedReport.petName : 'Not provided'}</p>
-                <p><strong>Type:</strong> {selectedReport.petType}</p>
-                <p><strong>Breed:</strong> {selectedReport.breed}</p>
-                <p><strong>Description:</strong> {selectedReport.description}</p>
-              </div>
-              
-              <div>
-                <h4 className="font-medium text-gray-500 mb-2">Report Information</h4>
-                <p><strong>Reporter:</strong> {selectedReport.reporterName}</p>
-                <p><strong>Contact:</strong> {selectedReport.contactInfo}</p>
-                <p><strong>Location:</strong> {selectedReport.location}</p>
-                <p><strong>Date Reported:</strong> {selectedReport.reportedDate}</p>
-                <p><strong>Status:</strong> {selectedReport.status.charAt(0).toUpperCase() + selectedReport.status.slice(1)}</p>
-              </div>
-              
-              {selectedReport.status === 'open' && (
-                <div className="md:col-span-2">
-                  <div className="mt-4 flex gap-2">
-                    <Button onClick={() => handleMarkAsMatched(selectedReport.id)}>
-                      Mark as Matched
-                    </Button>
-                    <Button variant="outline" onClick={() => handleMarkAsClosed(selectedReport.id)}>
-                      Close Report
-                    </Button>
-                  </div>
+            <DialogFooter className="border-t pt-4 mt-2">
+              <div className="w-full">
+                <h4 className="font-semibold mb-2">Update Status</h4>
+                <div className="flex justify-start space-x-3">
+                  <Button 
+                    variant={viewReport.status === 'resolved' ? 'default' : 'outline'} 
+                    className={viewReport.status === 'resolved' ? 'bg-blue-600 hover:bg-blue-700' : ''}
+                    onClick={() => handleUpdateStatus(viewReport.id, "resolved")}
+                  >
+                    Mark as Resolved
+                  </Button>
+                  <Button 
+                    variant={viewReport.status === 'closed' ? 'default' : 'outline'} 
+                    onClick={() => handleUpdateStatus(viewReport.id, "closed")}
+                  >
+                    Close Report
+                  </Button>
+                  <Button 
+                    variant={viewReport.status === 'pending' ? 'default' : 'outline'}
+                    onClick={() => handleUpdateStatus(viewReport.id, "pending")}
+                  >
+                    Mark as Pending
+                  </Button>
                 </div>
-              )}
-              
-              {selectedReport.status === 'matched' && (
-                <div className="md:col-span-2">
-                  <div className="mt-4 flex gap-2">
-                    <Button variant="outline" onClick={() => handleMarkAsClosed(selectedReport.id)}>
-                      Close Report
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+              </div>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );

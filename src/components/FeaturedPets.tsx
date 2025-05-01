@@ -1,15 +1,24 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import PetCard, { Pet } from './PetCard';
+import { getAvailablePets } from '@/services/petService';
 
 interface FeaturedPetsProps {
   title?: string;
-  pets: Pet[];
+  limit?: number;
 }
 
-const FeaturedPets = ({ title = "Featured Pets", pets }: FeaturedPetsProps) => {
+const FeaturedPets = ({ title = "Featured Pets", limit = 4 }: FeaturedPetsProps) => {
+  const [pets, setPets] = useState<Pet[]>([]);
+
+  useEffect(() => {
+    const availablePets = getAvailablePets();
+    // Take only the specified number of pets
+    setPets(availablePets.slice(0, limit));
+  }, [limit]);
+
   return (
     <section className="py-10">
       <div className="container mx-auto">
