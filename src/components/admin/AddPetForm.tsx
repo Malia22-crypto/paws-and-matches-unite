@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,7 +20,7 @@ interface PetFormData {
   type: "dog" | "cat" | "other";  // Fixed type to match the select options
   breed: string;
   age: string;
-  gender: "male" | "female" | "unknown";  // Fixed type to match the select options
+  gender: "male" | "female";  // Changed to match Pet type definition
   location: string;
   description: string;
   images: File[];
@@ -48,7 +49,8 @@ const AddPetForm = () => {
     if (name === 'type') {
       setFormData({ ...formData, [name]: value as "dog" | "cat" | "other" });
     } else if (name === 'gender') {
-      setFormData({ ...formData, [name]: value as "male" | "female" | "unknown" });
+      // Ensure we only accept values that match our type
+      setFormData({ ...formData, [name]: value as "male" | "female" });
     } else {
       setFormData({ ...formData, [name]: value });
     }
@@ -207,7 +209,6 @@ const AddPetForm = () => {
               <SelectContent>
                 <SelectItem value="male">Male</SelectItem>
                 <SelectItem value="female">Female</SelectItem>
-                <SelectItem value="unknown">Unknown</SelectItem>
               </SelectContent>
             </Select>
           </div>
