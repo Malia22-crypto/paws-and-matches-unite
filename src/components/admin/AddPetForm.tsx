@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,10 +16,10 @@ import { Pet } from '@/components/PetCard';
 
 interface PetFormData {
   name: string;
-  type: string;
+  type: "dog" | "cat" | "other";  // Fixed type to match the select options
   breed: string;
   age: string;
-  gender: string;
+  gender: "male" | "female" | "unknown";  // Fixed type to match the select options
   location: string;
   description: string;
   images: File[];
@@ -29,10 +28,10 @@ interface PetFormData {
 const AddPetForm = () => {
   const [formData, setFormData] = useState<PetFormData>({
     name: '',
-    type: '',
+    type: "dog",  // Default value
     breed: '',
     age: '',
-    gender: '',
+    gender: "male",  // Default value
     location: '',
     description: '',
     images: [],
@@ -46,7 +45,13 @@ const AddPetForm = () => {
   };
   
   const handleSelectChange = (name: string, value: string) => {
-    setFormData({ ...formData, [name]: value });
+    if (name === 'type') {
+      setFormData({ ...formData, [name]: value as "dog" | "cat" | "other" });
+    } else if (name === 'gender') {
+      setFormData({ ...formData, [name]: value as "male" | "female" | "unknown" });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
   
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -122,10 +127,10 @@ const AddPetForm = () => {
     // Reset form
     setFormData({
       name: '',
-      type: '',
+      type: "dog",
       breed: '',
       age: '',
-      gender: '',
+      gender: "male",
       location: '',
       description: '',
       images: [],
