@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -8,16 +7,22 @@ import { getAvailablePets } from '@/services/petService';
 interface FeaturedPetsProps {
   title?: string;
   limit?: number;
+  pets?: Pet[]; // Add pets prop to accept pets data from parent
 }
 
-const FeaturedPets = ({ title = "Featured Pets", limit = 4 }: FeaturedPetsProps) => {
+const FeaturedPets = ({ title = "Featured Pets", limit = 4, pets: propPets }: FeaturedPetsProps) => {
   const [pets, setPets] = useState<Pet[]>([]);
 
   useEffect(() => {
-    const availablePets = getAvailablePets();
-    // Take only the specified number of pets
-    setPets(availablePets.slice(0, limit));
-  }, [limit]);
+    if (propPets) {
+      // If pets are provided via props, use those
+      setPets(propPets.slice(0, limit));
+    } else {
+      // Otherwise, fetch pets from the service
+      const availablePets = getAvailablePets();
+      setPets(availablePets.slice(0, limit));
+    }
+  }, [limit, propPets]);
 
   return (
     <section className="py-10">
