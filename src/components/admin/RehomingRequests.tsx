@@ -25,6 +25,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { RehomingRequest } from '@/types/admin';
+import { sendRehomingApprovedNotification } from '@/services/notificationService';
+import { toast } from '@/components/ui/use-toast';
 
 const RehomingRequests = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -32,7 +34,7 @@ const RehomingRequests = () => {
   const [viewRequest, setViewRequest] = useState<RehomingRequest | null>(null);
   
   // Mock rehoming requests data
-  const rehomingRequests: RehomingRequest[] = [
+  const [rehomingRequests, setRehomingRequests] = useState<RehomingRequest[]>([
     {
       id: "1",
       petName: "Rocky",
@@ -72,7 +74,7 @@ const RehomingRequests = () => {
       submittedDate: "2023-04-11",
       status: "rejected"
     }
-  ];
+  ]);
   
   const filteredRequests = rehomingRequests.filter(request => {
     const matchesSearch = 
@@ -89,9 +91,45 @@ const RehomingRequests = () => {
     setViewRequest(request);
   };
   
-  const handleUpdateStatus = (id: string, newStatus: "pending" | "approved" | "rejected") => {
-    // Here you would update the status in your backend
-    console.log(`Updating rehoming request ${id} status to ${newStatus}`);
+  const handleUpdateStatus = async (id: string, newStatus: "pending" | "approved" | "rejected") => {
+    // Find the request
+    const request = rehomingRequests.find(req => req.id === id);
+    if (!request) return;
+    
+    // Update the status
+    setRehomingRequests(prevRequests => 
+      prevRequests.map(req => 
+        req.id === id ? { ...req, status: newStatus } : req
+      )
+    );
+    
+    // If the status is changed to approved, send an email notification
+    if (newStatus === "approved" && request.status !== "approved") {
+      try {
+        await sendRehomingApprovedNotification(
+          request.email,
+          request.ownerName,
+          request.petName
+        );
+        
+        toast({
+          title: "Status Updated",
+          description: `The rehoming request has been ${newStatus} and the owner has been notified via email.`,
+        });
+      } catch (error) {
+        console.error("Failed to send notification:", error);
+        toast({
+          title: "Status Updated",
+          description: `The rehoming request has been ${newStatus}, but there was an issue sending the notification email.`,
+          variant: "destructive",
+        });
+      }
+    } else {
+      toast({
+        title: "Status Updated",
+        description: `The rehoming request has been marked as ${newStatus}.`,
+      });
+    }
     
     // Close dialog if it's open for this request
     if (viewRequest?.id === id) {

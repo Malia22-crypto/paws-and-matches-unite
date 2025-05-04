@@ -25,6 +25,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { AdoptionRequest } from '@/types/admin';
+import { sendAdoptionApprovedNotification } from '@/services/notificationService';
+import { toast } from '@/components/ui/use-toast';
 
 const AdoptionRequests = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -32,7 +34,7 @@ const AdoptionRequests = () => {
   const [viewRequest, setViewRequest] = useState<AdoptionRequest | null>(null);
   
   // Mock adoption requests data
-  const adoptionRequests: AdoptionRequest[] = [
+  const [adoptionRequests, setAdoptionRequests] = useState<AdoptionRequest[]>([
     {
       id: "1",
       petName: "Bella",
@@ -63,7 +65,7 @@ const AdoptionRequests = () => {
       submittedDate: "2023-04-12",
       status: "rejected"
     }
-  ];
+  ]);
   
   const filteredRequests = adoptionRequests.filter(request => {
     const matchesSearch = 
@@ -79,9 +81,45 @@ const AdoptionRequests = () => {
     setViewRequest(request);
   };
   
-  const handleUpdateStatus = (id: string, newStatus: "pending" | "approved" | "rejected") => {
-    // Here you would update the status in your backend
-    console.log(`Updating adoption request ${id} status to ${newStatus}`);
+  const handleUpdateStatus = async (id: string, newStatus: "pending" | "approved" | "rejected") => {
+    // Find the request
+    const request = adoptionRequests.find(req => req.id === id);
+    if (!request) return;
+    
+    // Update the status
+    setAdoptionRequests(prevRequests => 
+      prevRequests.map(req => 
+        req.id === id ? { ...req, status: newStatus } : req
+      )
+    );
+    
+    // If the status is changed to approved, send an email notification
+    if (newStatus === "approved" && request.status !== "approved") {
+      try {
+        await sendAdoptionApprovedNotification(
+          request.email,
+          request.applicantName,
+          request.petName
+        );
+        
+        toast({
+          title: "Status Updated",
+          description: `The adoption request has been ${newStatus} and the applicant has been notified via email.`,
+        });
+      } catch (error) {
+        console.error("Failed to send notification:", error);
+        toast({
+          title: "Status Updated",
+          description: `The adoption request has been ${newStatus}, but there was an issue sending the notification email.`,
+          variant: "destructive",
+        });
+      }
+    } else {
+      toast({
+        title: "Status Updated",
+        description: `The adoption request has been marked as ${newStatus}.`,
+      });
+    }
     
     // Close dialog if it's open for this request
     if (viewRequest?.id === id) {
