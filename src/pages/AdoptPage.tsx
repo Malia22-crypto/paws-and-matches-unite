@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import MainLayout from '@/components/Layout/MainLayout';
@@ -100,7 +101,7 @@ const AdoptPage = () => {
 
   return (
     <MainLayout>
-      <div className="container mx-auto">
+      <div className="container mx-auto py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-pet-blue-dark mb-4">Adopt a Pet</h1>
           <p className="text-gray-600 max-w-3xl">
@@ -109,39 +110,42 @@ const AdoptPage = () => {
         </div>
 
         <div className="bg-white rounded-xl shadow-md p-6 mb-8">
-          <div className="flex flex-col md:flex-row gap-4 mb-4">
+          <div className="flex flex-col md:flex-row gap-4">
             <SearchBar 
               searchTerm={searchTerm}
               onSearchChange={setSearchTerm}
               onSearch={handleSearch}
             />
             
-            <div className="flex gap-2">
-              <Button onClick={handleSearch} className="bg-pet-blue hover:bg-pet-blue-dark">
-                Search
-              </Button>
-              
-              <FiltersSection 
-                showFilters={showFilters}
-                setShowFilters={setShowFilters}
-                selectedType={selectedType}
-                selectedBreed={selectedBreed}
-                selectedGender={selectedGender}
-                selectedAge={selectedAge}
-                selectedSize={selectedSize}
-                isVaccinated={isVaccinated}
-                isSpayed={isSpayed}
-                onTypeChange={setSelectedType}
-                onBreedChange={setSelectedBreed}
-                onGenderChange={setSelectedGender}
-                onAgeChange={setSelectedAge}
-                onSizeChange={setSelectedSize}
-                onVaccinatedChange={setIsVaccinated}
-                onSpayedChange={setIsSpayed}
-                onReset={handleReset}
-                hasActiveFilters={hasActiveFilters}
-              />
-            </div>
+            <Button 
+              onClick={handleSearch} 
+              className="md:w-auto w-full bg-pet-blue hover:bg-pet-blue-dark font-medium"
+            >
+              Search
+            </Button>
+          </div>
+          
+          <div className="mt-4">
+            <FiltersSection 
+              showFilters={showFilters}
+              setShowFilters={setShowFilters}
+              selectedType={selectedType}
+              selectedBreed={selectedBreed}
+              selectedGender={selectedGender}
+              selectedAge={selectedAge}
+              selectedSize={selectedSize}
+              isVaccinated={isVaccinated}
+              isSpayed={isSpayed}
+              onTypeChange={setSelectedType}
+              onBreedChange={setSelectedBreed}
+              onGenderChange={setSelectedGender}
+              onAgeChange={setSelectedAge}
+              onSizeChange={setSelectedSize}
+              onVaccinatedChange={setIsVaccinated}
+              onSpayedChange={setIsSpayed}
+              onReset={handleReset}
+              hasActiveFilters={hasActiveFilters}
+            />
           </div>
         </div>
         
